@@ -43,7 +43,7 @@
   const handleClick = async () => {
     if(searchValue.value !== ''){
       const result = await axios.get(
-    `http://pro.openweathermap.org/geo/1.0/direct?q=${searchValue.value}&limit=5&appid=1c849bf90b29b235b780628530433380`);
+    `https://pro.openweathermap.org/geo/1.0/direct?q=${searchValue.value}&limit=5&appid=1c849bf90b29b235b780628530433380`);
       geoResponse.value = await result.data;
       return;
     } else {

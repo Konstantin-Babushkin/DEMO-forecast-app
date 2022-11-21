@@ -30,7 +30,7 @@
             <p class="text-subtitle1 q-mb-none">Feels like: {{Math.round(weatherDataNow.main.feels_like)}}&deg;</p>
             <p class="text-subtitle1 q-mb-none">Description: {{weatherDataNow.weather[0].description}}</p>
             <img
-            :src="`http://openweathermap.org/img/wn/${weatherDataNow.weather[0].icon}@2x.png`"
+            :src="`https://openweathermap.org/img/wn/${weatherDataNow.weather[0].icon}@2x.png`"
             alt="weather-icon"
             />
         </div>
@@ -48,7 +48,7 @@
                   {{item.dt_txt.slice(11,16)}}
               </p>
               <img
-              :src="`http://openweathermap.org/img/wn/${item.weather[0].icon}@2x.png`"
+              :src="`https://openweathermap.org/img/wn/${item.weather[0].icon}@2x.png`"
               alt="hour-weather-icon"
               style="width: 50px"
               />
