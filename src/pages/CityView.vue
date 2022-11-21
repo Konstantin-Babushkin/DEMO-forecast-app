@@ -9,7 +9,7 @@
 </template>
 
 <script lang="ts" setup>
-    import AsyncCityViewVue from 'src/components/AsyncCityView.vue';
+    import AsyncCityViewVue from '../components/AsyncCityView.vue';
 </script>
 
 <style>

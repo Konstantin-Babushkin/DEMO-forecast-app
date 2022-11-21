@@ -1,5 +1,5 @@
 <template>
-  <div class="row justify-center bg-indigo-3">
+  <div class="row justify-center bg-indigo-3" :key="renderKey">
     <q-card class="column justify-center q-my-lg bg-grey-4" style="width: 70%">
       <q-card-section class="column items-center">
         <h2 class="column q-mb-sm q-mt-lg" style="text-align: center">{{weatherDataNow.name}}</h2>
@@ -64,39 +64,53 @@
 </template>
 
 <script lang="ts" setup>
-    import axios from 'axios';
-    import { useRoute } from 'vue-router';
-    // import { computed, watch } from 'vue'
-    
-    const route = useRoute();
+  import axios from 'axios';
+  import { useRoute } from 'vue-router';
+  import { ref, watch } from 'vue'
+  
+  const route = useRoute();
 
-//     watch(route, (query) => {
-//   console.log('Route: ' + query);
-// });
+  // assign query values to latitude and longitude refs
+  const lat = ref(route.query.lat);
+  const lon = ref(route.query.lon);
 
-    const getWeatherNow = async () => {
-        try {
-            const weather = await axios.get(`https://pro.openweathermap.org/data/2.5/weather?lat=${route.query.lat}&lon=${route.query.lon}&units=metric&appid=1c849bf90b29b235b780628530433380`)
-            
-            // get local date & time
-            const localOffset = new Date().getTimezoneOffset() * 60000;
-            const utc = weather.data.dt * 1000 + localOffset;
-            weather.data.currentTime = utc + 1000 * weather.data.timezone;
-            return weather.data;
-        } catch (err) {
-            console.log(err)
-        }
+  // renderKey forces re-render every time the route changes
+  const renderKey = ref(0)
+
+  // watch for change in the route. On change, a new render is forced and fresh data is displayed
+  watch(route, async (newValue) => {
+    lat.value = newValue.query.lat;
+    lon.value = newValue.query.lon;
+    weatherDataNow = await getWeatherNow();
+    weatherDataForecast = await getWeatherFiveDays();
+    renderKey.value++
+  });
+
+  const getWeatherNow = async () => {
+    try {
+      const weather = await axios.get(`https://pro.openweathermap.org/data/2.5/weather?lat=${lat.value}&lon=${lon.value}&units=metric&appid=1c849bf90b29b235b780628530433380`)
+      
+      // get local date & time
+      const localOffset = new Date().getTimezoneOffset() * 60000;
+      const utc = weather.data.dt * 1000 + localOffset;
+      weather.data.currentTime = utc + 1000 * weather.data.timezone;
+      return weather.data;
+    } catch (err) {
+        console.log(err)
     }
+  }
 
-    const getWeatherFiveDays = async () => {
-        try {
-            const weather = await axios.get(`https://pro.openweathermap.org/data/2.5/forecast?lat=${route.query.lat}&lon=${route.query.lon}&units=metric&appid=1c849bf90b29b235b780628530433380`)
-            return weather.data.list.slice(0,9);
-        } catch (err) {
-            console.log(err)
-        }
+  // get weather data for the next 24 hours with 3-hour step
+  const getWeatherFiveDays = async () => {
+    try {
+        const weather = await axios.get(`https://pro.openweathermap.org/data/2.5/forecast?lat=${lat.value}&lon=${lon.value}&units=metric&appid=1c849bf90b29b235b780628530433380`)
+        return weather.data.list.slice(0,9);
+    } catch (err) {
+        console.log(err)
     }
+  }
 
-    const weatherDataNow = await getWeatherNow();
-    const weatherDataForecast = await getWeatherFiveDays();
+  // assign responses from API to vars that are used for displaying the data 
+  let weatherDataNow = await getWeatherNow();
+  let weatherDataForecast = await getWeatherFiveDays();
 </script>

@@ -32,19 +32,14 @@
   import { ref, reactive, watchEffect, onUnmounted } from 'vue';
   import axios from 'axios';
   import {useRouter} from 'vue-router'
+  import City from '../components/CityInterface'
 
-  // searching a city
-  interface City {
-    name: string,
-    country: string,
-    lat: number,
-    lon: number,
-  }
-  
+  // vars for searching a city name using input
   const router = useRouter();
   const searchValue = ref<string>('');
   const geoResponse = ref<null | City[]>(null)
 
+  // get coordinates by city's name
   const handleClick = async () => {
     if(searchValue.value !== ''){
       const result = await axios.get(
@@ -57,6 +52,7 @@
     }
   }
 
+  // push coordinates and router params to the next view
   const cityChoice = (city : City) => {
     const name : string = city.name;
     const country : string = city.country;
@@ -68,7 +64,7 @@
       name: 'cityView',
       params: { country: country, city: name },
       query: { lat: lat, lon: lon}
-    })
+    })    
   }
 
   // current location
@@ -78,12 +74,14 @@
   })
   const coordFound = ref(false)
 
+  // assign current geolocation to latLon object
   const showPosition = (position : GeolocationPosition) => {
     latLon.lat = position.coords.latitude;
     latLon.lon = position.coords.longitude;
     coordFound.value = true;
   };
 
+  // start looking for current geolocation
   if (navigator.geolocation) {
     navigator.geolocation.getCurrentPosition(showPosition)
   } else {
@@ -92,6 +90,7 @@
     );
   }
 
+  // push latLon values (coordinates) to the next view
   const stopWatching = watchEffect(()=>{
     if (coordFound.value) {
       console.log('in render')
